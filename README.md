@@ -357,3 +357,6 @@ Visualizer.plot_advanced_word_frequency(
 | `--dpi` | | 視覺化分辨率（預設：300） |
 | `--debug` | | 啟用調試模式 |
 | `--advanced-viz` | `-av` | 進階詞頻視覺化選項（例如：pie,vertical,length）|
+
+## 鳴謝
+此程式由Claude 3.7 Sonnet及Deepseek協助完成。
