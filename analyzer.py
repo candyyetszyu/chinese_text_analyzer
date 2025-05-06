@@ -17,9 +17,14 @@ class ChineseTextAnalyzer:
             'resources'
         )
         
+        # 記錄路徑
+        self.custom_dict_path = None
+        self.stopwords_path = None
+        
         # 載入自訂詞典或默認詞典
         if custom_dict_path:
             jieba.load_userdict(custom_dict_path)
+            self.custom_dict_path = custom_dict_path
             # 計算預設詞典詞數
             dict_words = self._count_words_in_dict(custom_dict_path)
             print(f"已載入預設詞典: {custom_dict_path}, 共 {dict_words} 個詞")
@@ -27,6 +32,7 @@ class ChineseTextAnalyzer:
             default_dict_path = os.path.join(self.resources_path, 'custom_dict.txt')
             if os.path.exists(default_dict_path):
                 jieba.load_userdict(default_dict_path)
+                self.custom_dict_path = default_dict_path
                 # 計算預設詞典詞數
                 dict_words = self._count_words_in_dict(default_dict_path)
                 print(f"已載入預設詞典: {default_dict_path}, 共 {dict_words} 個詞")
@@ -35,11 +41,13 @@ class ChineseTextAnalyzer:
         self.stopwords = set()
         if stopwords_path:
             self.load_stopwords(stopwords_path)
+            self.stopwords_path = stopwords_path
             print(f"已載入預設停用詞表: {stopwords_path}, 共 {len(self.stopwords)} 個詞")
         else:
             default_stopwords_path = os.path.join(self.resources_path, 'chinese_stopwords.txt')
             if os.path.exists(default_stopwords_path):
                 self.load_stopwords(default_stopwords_path)
+                self.stopwords_path = default_stopwords_path
                 print(f"已載入預設停用詞表: {default_stopwords_path}, 共 {len(self.stopwords)} 個詞")
         
         # 載入情感詞典
@@ -77,6 +85,8 @@ class ChineseTextAnalyzer:
                 line = line.strip()
                 if line and not line.startswith('#'):
                     self.stopwords.add(line)
+        # 更新停用詞表路徑
+        self.stopwords_path = file_path
     
     def preprocess_text(self, text):
         """文本預處理：分詞、去除停用詞、標點符號等"""

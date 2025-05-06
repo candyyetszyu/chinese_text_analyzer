@@ -403,7 +403,7 @@ class Visualizer:
     @staticmethod
     def plot_advanced_word_frequency(word_freq, top_n=20, categories=None, exclude_words=None, 
                                    title='詞頻統計分析', save_path=None, figsize=(14, 8), 
-                                   sort_by='frequency', plot_type='horizontal', color_map='viridis'):
+                                   sort_by='frequency', plot_type='horizontal', color_map='viridis', dpi=300):
         """
         繪製高級詞頻可視化，支持更多自定義選項
         
@@ -429,6 +429,8 @@ class Visualizer:
             圖表類型，可選 'horizontal'(水平條形圖), 'vertical'(垂直條形圖), 'pie'(餅圖)
         color_map : str
             顏色映射，例如 'viridis', 'plasma', 'inferno', 'magma', 'cividis'
+        dpi : int
+            圖像解析度，默認為300
         
         Returns:
         --------
@@ -557,7 +559,7 @@ class Visualizer:
         # 保存圖表
         if save_path:
             os.makedirs(os.path.dirname(os.path.abspath(save_path)), exist_ok=True)
-            plt.savefig(save_path, dpi=300, bbox_inches='tight')
+            plt.savefig(save_path, dpi=dpi, bbox_inches='tight')
             
         plt.close()
         return True
