@@ -6,6 +6,61 @@
 
 Chinese Text Analyzer 是一個用 Python 開發的中文文本分析工具，提供詞頻統計、詞性分析、命名實體識別、情感分析等功能，並支援繁簡體中文轉換和視覺化結果展示。
 
+## 使用方式
+
+### 互動式菜單介面（推薦）
+
+本工具提供了一個方便的互動式菜單介面，適合不熟悉命令行參數的用戶：
+
+```bash
+python menu.py
+```
+
+啟動後，您將看到以下主菜單：
+
+```
+=== 中文文本分析工具 ===
+版本：1.0.0
+=========================
+
+主菜單:
+1. 分析單個文件
+2. 批量分析文件
+3. 繁簡體轉換
+4. 設置選項
+5. 查看當前設置
+0. 退出程序
+```
+
+菜單介面的優點：
+- 無需記憶複雜的命令行參數
+- 直觀的設置選項，包括輸出格式、視覺化選項等
+- 方便的中文字體設置（特別是在 macOS 上）
+- 即時顯示分析進度和結果
+- 集成了繁簡體中文轉換功能
+
+主要功能菜單：
+- **分析單個文件**：對選定的中文文本進行全面分析
+- **批量分析文件**：一次處理多個文本文件
+- **繁簡體轉換**：進行繁簡體中文轉換（支持文本和文件）
+- **設置選項**：調整分析工具的各種參數
+- **查看當前設置**：顯示目前的配置參數
+
+進階選項設置包括：
+- 輸出目錄和格式設定（支持JSON、CSV、Excel）
+- 視覺化圖表控制
+- 圖像解析度（DPI）調整
+- 中文字體設置（自動檢測系統字體）
+- 自定義詞典和停用詞表配置
+
+### 命令行界面
+
+除了菜單介面外，本工具也保留了完整的命令行界面，適合進階用戶或批處理需求：
+
+```bash
+python main.py --input input_texts/sample.txt --output results
+```
+
 ## 專案結構
 
 ```
@@ -13,28 +68,154 @@ chinese_text_analyzer/
 ├── analyzer.py        # 核心分析功能實現
 ├── file_utils.py      # 文件操作工具類
 ├── main.py            # 命令行界面和主程序入口
+├── menu.py            # 互動式菜單介面
 ├── visualization.py   # 數據視覺化功能
 ├── setup_chinese_font.py  # 中文字體配置工具
 ├── convert_chinese.py # 繁簡體中文轉換工具
+├── convert_to_traditional.py # 簡體轉繁體工具（備用）
 ├── README.md          # 專案說明文檔
 ├── resources/         # 預設資源目錄
 │   ├── chinese_stopwords.txt  # 中文停用詞表
 │   ├── custom_dict.txt        # 自定義詞典
 │   ├── positive_words.txt     # 正面情感詞典
-│   └── negative_words.txt     # 負面情感詞典
+│   ├── negative_words.txt     # 負面情感詞典
+│   └── mappings/              # 詞性和實體映射文件
+│       ├── pos_mapping.json   # 詞性映射
+│       ├── entity_mapping.json # 實體類型映射
+│       └── sentiment_mapping.json # 情感標籤映射
 ├── input_texts/       # 輸入文本文件目錄
 └── results/           # 分析結果輸出目錄
+    └── visualizations/      # 視覺化圖表目錄
+        └── advanced/        # 進階詞頻視覺化目錄
+```
+
+## 主要功能
+
+### 核心分析功能
+
+- **詞頻分析**：統計文本中各詞語出現的頻率
+- **詞性分析**：分析文本中不同詞性的分佈
+- **命名實體識別**：識別文本中的人名、地名、機構名等
+- **情感分析**：分析文本的情感傾向（正面、負面或中性）
+- **關鍵詞提取**：基於 TF-IDF 算法提取文本關鍵詞
+- **文本摘要**：自動生成文本摘要
+- **N-gram分析**：識別文本中的常見詞組
+
+### 繁簡體轉換
+
+本工具提供完整的繁簡體中文轉換功能：
+
+- **互動式轉換**：通過菜單界面直接轉換文本或文件
+- **文本轉換**：直接在界面中輸入文本並轉換
+- **文件轉換**：轉換整個文件，支持多種格式
+- **批量轉換**：支持批量處理整個目錄中的文件
+- **雙向轉換**：支持簡體→繁體和繁體→簡體轉換
+
+通過命令行使用繁簡體轉換工具：
+
+```bash
+# 將單個文件從簡體轉為繁體
+python convert_chinese.py --file your_file.txt
+
+# 將單個文件從繁體轉為簡體
+python convert_chinese.py --file your_file.txt --t2s
+
+# 轉換整個目錄中的特定類型文件
+python convert_chinese.py --dir your_folder --ext .txt,.md
+```
+
+### 視覺化功能
+
+本工具生成多種視覺化圖表，幫助直觀理解文本分析結果：
+
+- **詞頻統計圖**：展示詞語使用頻率
+- **詞雲圖**：以視覺化方式展示高頻詞
+- **詞性分布圖**：分析詞性結構
+- **情感分析圖**：展示文本情感傾向
+- **命名實體統計圖**：統計不同類型的命名實體
+- **關鍵詞權重圖**：展示關鍵詞的重要性
+- **N-gram頻率圖**：展示常見詞組
+
+#### 進階詞頻視覺化
+
+本工具還提供多種進階詞頻視覺化選項：
+
+- **詞頻分布餅圖**：展示詞語分布比例
+- **詞頻垂直條形圖**：比標準水平條形圖更適合某些分析場景
+- **按詞長度排序的詞頻圖**：展示不同長度詞語的使用頻率
+
+### 圖像解析度設置
+
+使用菜單界面或命令行參數可以調整視覺化圖表的解析度（DPI），以平衡生成速度和圖像質量：
+
+- **300 DPI**：高質量（默認）
+- **150 DPI**：一般用途
+- **72 DPI**：快速預覽
+
+設置DPI值可以顯著影響處理大量文件時的性能：
+
+```bash
+# 命令行中設置DPI
+python main.py --input sample.txt --output results --dpi 150
+
+# 在菜單界面中設置
+4. 設置選項 > 4. 設置圖像解析度 (DPI)
 ```
 
 ## 文本處理能力
 
-本工具對於可分析的文本大小沒有明確限制，可處理從短句到長篇文章的各種中文文本。處理效率取決於系統配置和文本規模。對於特別大的文件（數百萬字以上），建議使用 `--parallel` 參數啟用並行處理模式以提高效率。
+本工具可處理各種規模的中文文本，從短句到長篇文章。處理效率取決於系統配置和文本規模。
+
+### 處理時間估算
+
+| 文本大小 | 估計處理時間 |
+| --- | --- |
+| 小型文本（1-5 KB，約 500-2,500 字） | 5-10 秒 |
+| 中型文本（10-50 KB，約 5,000-25,000 字） | 20-60 秒 |
+| 大型文本（100-500 KB，約 50,000-250,000 字） | 2-5 分鐘 |
+| 超大型文本（1MB+ ，超過 500,000 字） | 10+ 分鐘 |
+
+### 加速處理方法
+
+提高處理效率的方法：
+
+1. **使用並行處理**：適用於批量處理多個文件
+   ```bash
+   # 命令行中啟用並行處理
+   python main.py --input input_folder --batch --parallel
+   
+   # 在菜單界面中啟用
+   2. 批量分析文件 > 是否使用並行處理 > y
+   ```
+
+2. **調低視覺化解析度**：降低DPI值可大幅縮短處理時間
+   ```bash
+   # 使用低分辨率模式以加快渲染
+   python main.py --input sample.txt --dpi 72
+   ```
+
+3. **關閉不必要的視覺化**：選擇性生成視覺化圖表
+   ```bash
+   # 只生成詞雲和詞頻統計圖
+   python main.py --input sample.txt --viz word_frequency,wordcloud
+   
+   # 在菜單界面中
+   4. 設置選項 > 3. 設置視覺化選項
+   ```
 
 ## 環境設置
 
+### 必要依賴
+
+運行此工具需要以下 Python 庫：
+
+```bash
+pip install jieba pandas matplotlib seaborn wordcloud xlsxwriter opencc-python-reimplemented chardet
+```
+
 ### 使用虛擬環境（推薦）
 
-為避免依賴衝突，建議使用虛擬環境運行此項目：
+為避免依賴衝突，建議使用虛擬環境：
 
 ```bash
 # 創建並啟動虛擬環境
@@ -43,158 +224,32 @@ source venv/bin/activate  # macOS/Linux
 # venv\Scripts\activate   # Windows
 
 # 安裝依賴
-pip install -r requirements.txt
-```
-
-如果您還沒有 requirements.txt 文件，可以安裝以下依賴：
-
-```bash
 pip install jieba pandas matplotlib seaborn wordcloud xlsxwriter opencc-python-reimplemented chardet
 ```
-
-## 快速開始
-
-### 基本用法
-
-分析單個文件：
-
-```bash
-python main.py --input input_texts/sample.txt --output results
-```
-
-此命令會生成分析結果並保存到 `results` 目錄，包括文字分析結果和視覺化圖表。
-
-## 主要功能
-
-- **詞頻分析**：統計文本中各詞語出現的頻率
-- **詞性分析**：分析文本中不同詞性的分佈
-- **命名實體識別**：識別文本中的人名、地名、機構名等
-- **情感分析**：分析文本的情感傾向（正面、負面或中性）
-- **關鍵詞提取**：基於 TF-IDF 算法提取文本關鍵詞
-- **文本摘要**：自動生成文本摘要
-- **繁簡體轉換**：支持繁體中文和簡體中文的相互轉換
-- **N-gram分析**：識別文本中的常見詞組
-
-## 預設資源
-
-本工具提供了多種預設資源文件，自動優化文本分析效果：
-
-### 停用詞表
-
-預設的中文停用詞表 (`resources/chinese_stopwords.txt`) 包含常見的功能詞，如：
-
-- 代詞 (我, 你, 他, 她, 它, 們)
-- 助詞 (的, 地, 得, 了, 著)
-- 連詞 (和, 與, 而, 但)
-- 介詞 (在, 於, 從, 對)
-- 常用動詞 (是, 有, 來, 去, 說)
-- 指示詞 (這, 那, 些)
-
-### 情感詞典
-
-預設的情感詞典用於提高情感分析準確度：
-
-- 正面情感詞典 (`resources/positive_words.txt`)：包含 50+ 正面情感詞
-- 負面情感詞典 (`resources/negative_words.txt`)：包含 50+ 負面情感詞
-
-### 自定義詞典
-
-預設的自定義詞典 (`resources/custom_dict.txt`) 包含多種專業術語和實體名稱，包括：
-
-- 人名 (政治人物, 科技領袖)
-- 地名 (主要中國城市及地區)
-- 機構名 (主要中國科技公司)
-- 專業術語 (人工智能, 機器學習, 區塊鏈等)
-- 網路用語 (流行網絡術語)
-
-## 進階用法
-
-### 批量處理多個文件
-
-```bash
-python main.py --input input_folder --output results --batch
-```
-
-### 指定輸出格式
-
-```bash
-python main.py --input sample.txt --output results --formats json,csv,excel
-```
-
-### 自定義詞典和停用詞
-
-您可以使用自定義詞典來提高分詞準確性，並使用停用詞表過濾不需要的詞語：
-
-```bash
-python main.py --input sample.txt --dict custom_dict.txt --stopwords stopwords.txt
-```
-
-自定義詞典格式範例：
-```
-詞語 詞頻 詞性
-人工智能 100 n
-機器學習 80 n
-深度學習 60 n
-```
-
-停用詞格式範例（每行一個詞）：
-```
-的
-了
-和
-```
-
-也可以在程式中設置：
-
-```python
-analyzer = ChineseTextAnalyzer()
-analyzer.load_stopwords('path/to/stopwords.txt')
-analyzer.load_user_dict('path/to/custom_dict.txt')
-```
-
-### 加速大規模文本處理
-
-```bash
-python main.py --input large_corpus --batch --parallel
-```
-
-### 選擇性生成視覺化圖表
-
-```bash
-# 只生成詞雲和詞頻統計圖
-python main.py --input sample.txt --viz word_frequency,wordcloud
-```
-
-可用的視覺化類型：
-- `word_frequency` - 詞頻統計圖
-- `wordcloud` - 詞雲圖
-- `pos_distribution` - 詞性分布圖
-- `sentiment` - 情感分析圖
-- `ngrams` - 詞組頻率圖
-- `entities` - 命名實體統計圖
-- `keywords` - 關鍵詞權重圖
 
 ## 中文字體配置
 
 ### macOS中文字體問題解決方案
 
-在 macOS 上使用 matplotlib 顯示中文可能會遇到字體問題。本工具提供多種解決方案：
+在 macOS 上使用 matplotlib 顯示中文時可能遇到字體問題。本工具提供多種解決方案：
 
-#### 自動配置中文字體
+#### 使用菜單界面自動檢測系統字體
 
-```bash
-# 運行字體配置工具
-python setup_chinese_font.py
+菜單界面會自動檢測macOS系統上的常見中文字體，並提供選擇：
+
 ```
-
-此工具會自動檢測系統中可用的中文字體，並配置 matplotlib 使用最合適的字體。
+4. 設置選項 > 5. 設置中文字體
+```
 
 #### 手動指定字體
 
-您也可以直接指定字體路徑：
+指定字體路徑：
 
 ```bash
+# 命令行界面
 python main.py --input sample.txt --font /System/Library/Fonts/PingFang.ttc
+
+# 或使用菜單界面手動輸入路徑
 ```
 
 常見的 macOS 中文字體路徑：
@@ -204,41 +259,37 @@ python main.py --input sample.txt --font /System/Library/Fonts/PingFang.ttc
 - `/System/Library/Fonts/Hiragino Sans GB.ttc`
 - `/System/Library/Fonts/Songti.ttc`
 
-#### 查看系統可用中文字體
+#### 使用字體配置工具
 
 ```bash
-python -c "import matplotlib.font_manager as fm; print('\n'.join([f for f in fm.findSystemFonts() if any(k in f.lower() for k in ['ping', 'hei', 'song', 'ming'])]))"
+python setup_chinese_font.py
 ```
 
-## 繁簡體轉換工具
+## 預設資源
 
-### 轉換單個文件
+本工具內置多種資源文件，優化分析效果：
 
-```bash
-python convert_chinese.py --file your_file.py
-```
+### 停用詞和自定義詞典
 
-### 轉換整個目錄
+- **停用詞表**：過濾常見但無意義的詞（代詞、助詞、連詞等）
+- **自定義詞典**：包含專業術語、實體名稱、常見複合詞等
 
-```bash
-python convert_chinese.py --dir . --ext .py
-```
+### 情感詞典
 
-### 遞歸轉換整個項目
+- **正面情感詞典**：包含各類正面情感詞
+- **負面情感詞典**：包含各類負面情感詞
 
-```bash
-python convert_chinese.py --dir . --recursive
-```
+### 標籤映射文件
 
-顯示更多選項：
+JSON格式的映射文件用於將技術代碼轉換為更易讀的中文標籤：
 
-```bash
-python convert_chinese.py --help
-```
+- **詞性映射**：將簡短詞性代碼轉換為中文詞性名稱
+- **實體類型映射**：將英文實體類型轉換為中文標籤
+- **情感標籤映射**：將情感分析結果轉換為中文情感標籤
 
-## 使用API進行自定義分析
+## API 使用指南
 
-除了命令行界面外，您也可以將此工具作為程式庫在您的 Python 專案中使用：
+除了互動式菜單和命令行界面，您也可以在Python程式中直接使用本工具的API：
 
 ```python
 from analyzer import ChineseTextAnalyzer
@@ -274,7 +325,18 @@ viz_dir = Visualizer.create_visualization_report(
     results,
     output_dir='my_visualizations',
     prefix='custom_',
-    font_path='/System/Library/Fonts/PingFang.ttc'
+    font_path='/System/Library/Fonts/PingFang.ttc',
+    dpi=300
+)
+
+# 使用進階詞頻視覺化API
+Visualizer.plot_advanced_word_frequency(
+    results['word_frequency'],
+    top_n=15,
+    title='詞頻分布餅圖',
+    save_path='my_visualizations/word_freq_pie.png',
+    plot_type='pie',
+    dpi=300
 )
 ```
 
@@ -286,9 +348,12 @@ viz_dir = Visualizer.create_visualization_report(
 | `--output` | `-o` | 輸出目錄路徑（預設：results） |
 | `--dict` | `-d` | 自定義詞典路徑 |
 | `--stopwords` | `-s` | 停用詞表路徑 |
-| `--formats` | `-f` | 輸出格式（預設：json） |
-| `--viz` | `-v` | 視覺化類型（例如：wordcloud,sentiment） |
+| `--formats` | `-f` | 輸出格式（預設：json，可選：csv,excel） |
+| `--no-viz` | | 不生成視覺化圖表 |
 | `--batch` | `-b` | 批量處理模式 |
 | `--parallel` | `-p` | 使用並行處理 |
+| `--extensions` | `-e` | 要處理的文件擴展名（批量模式） |
 | `--font` | | 中文字體路徑 |
+| `--dpi` | | 視覺化分辨率（預設：300） |
 | `--debug` | | 啟用調試模式 |
+| `--advanced-viz` | `-av` | 進階詞頻視覺化選項（例如：pie,vertical,length）|

@@ -5,6 +5,7 @@ from wordcloud import WordCloud
 import seaborn as sns
 import os
 import numpy as np
+import json
 
 # Configure matplotlib to use Chinese font
 CHINESE_FONT_PATH = '/System/Library/Fonts/STHeiti Light.ttc'
@@ -32,126 +33,50 @@ else:
     if DEFAULT_CHINESE_FONT is None:
         pass
 
-# 詞性映射（簡體/英文 -> 繁體）
-POS_MAPPING = {
-    # 詞性標注集
-    'n': '名詞',
-    'v': '動詞',
-    'adj': '形容詞',
-    'adv': '副詞',
-    'prop': '代詞',
-    'prep': '介詞',
-    'conj': '連詞',
-    'num': '數詞',
-    'meas': '量詞',
-    'aux': '助詞',
-    'punc': '標點',
-    'nr': '人名',
-    'ns': '地名',
-    'nt': '機構名',
-    'nz': '專有名詞',
-    'a': '形容詞',
-    'd': '副詞',
-    'm': '數量詞',
-    'r': '代詞',
-    'c': '連詞',
-    'p': '介詞',
-    'u': '助詞',
-    'xc': '其他',
-    'w': '標點',
-    'f': '方位詞',
-    'g': '語素',
-    'h': '前綴',
-    'k': '後綴',
-    'j': '簡稱',
-    'l': '習用語',
-    'i': '成語',
-    'q': '量詞',
-    's': '處所詞',
-    't': '時間詞',
-    'tg': '時語素',
-    'vd': '副動詞',
-    'vn': '名動詞',
-    'y': '語氣詞',
-    'z': '狀態詞',
-    'ag': '形語素',
-    'dg': '副語素',
-    'ng': '名語素',
-    'vg': '動語素',
-    # 擴展的詞性映射
-    'eng': '英文詞',
-    'b': '區別詞',
-    'zg': '狀態語素',
-    'rg': '代詞語素',
-    'mg': '數語素',
-    'o': '擬聲詞',
-    'e': '嘆詞',
-    'x': '非語素字',
-    'xx': '非語素字',
-    'zh': '非語素字詞',
-    'vf': '趨向詞',
-    'vi': '不及物動詞',
-    'vq': '動詞後綴',
-    'al': '形容詞性成語',
-    'an': '名形詞',
-    'ad': '副形詞',
-    'bl': '區別詞性成語',
-    'dl': '副詞性成語',
-    'il': '成語',
-    'nl': '名詞性成語',
-    'rl': '代詞性成語',
-    'tl': '時間詞性語素',
-    'vl': '動詞性成語',
-    'zl': '狀態詞性成語',
-    'rr': '人稱代詞',
-    'rz': '指示代詞',
-    'rx': '代詞性語素',
-    'nrf': '音譯人名',
-    'per': '人名',
-    'loc': '地名',
-    'org': '機構名',
-    'time': '時間詞',
-    'nrt': '音譯人名',
-    'noun': '名詞',
-    'verb': '動詞',
-    'adj': '形容詞',
-    'adv': '副詞',
-    'pron': '代詞',
-    'prep': '介詞',
-    'conj': '連詞',
-    'art': '冠詞',
-    'num': '數詞',
-    'int': '嘆詞',
-    'aux': '助詞',
-    'punc': '標點',
-    'acronym': '縮略語',
-    'sub': '代詞',
-    'quantifier': '量詞',
-    'det': '限定詞',
-    'particle': '助詞',
-    'exclamation': '嘆詞',
-    'modal': '情態詞',
-    'functional': '功能詞',
-    'idiom': '成語',
-    'slang': '俚語',
-    'phrase': '短語',
-    'proverb': '諺語',
-    'interjection': '嘆詞'
-}
+# 定義資源文件的基礎路徑
+RESOURCES_PATH = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)),
+    'resources'
+)
 
-# 實體類型映射（英文 -> 繁體）
-ENTITY_MAPPING = {
-    'person': '人物',
-    'location': '地點',
-    'organization': '組織'
-}
+# 從資源文件加載映射
+def load_mapping_from_json(filename):
+    # 首先嘗試從 mappings 子目錄加載
+    filepath = os.path.join(RESOURCES_PATH, 'mappings', filename)
+    if os.path.exists(filepath):
+        try:
+            with open(filepath, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"無法從 mappings 目錄加載映射文件 {filename}: {e}")
+            # 如果從 mappings 目錄加載失敗，嘗試從根目錄加載（向後兼容）
+            root_filepath = os.path.join(RESOURCES_PATH, filename)
+            if os.path.exists(root_filepath):
+                try:
+                    with open(root_filepath, 'r', encoding='utf-8') as f:
+                        return json.load(f)
+                except Exception as e:
+                    print(f"無法加載映射文件 {filename}: {e}")
+                    return {}
+            return {}
+    else:
+        # 如果 mappings 目錄中沒有找到，嘗試從根目錄加載（向後兼容）
+        root_filepath = os.path.join(RESOURCES_PATH, filename)
+        if os.path.exists(root_filepath):
+            try:
+                with open(root_filepath, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+            except Exception as e:
+                print(f"無法加載映射文件 {filename}: {e}")
+                return {}
+        else:
+            print(f"映射文件不存在: {filepath} 或 {root_filepath}")
+            return {}
 
-# 情感標籤映射（英文 -> 繁體）
-SENTIMENT_MAPPING = {
-    'positive': '正面情感',
-    'negative': '負面情感',
-    'neutral': '中性情感'
-}
+# 載入詞性、實體和情感標籤映射
+POS_MAPPING = load_mapping_from_json('pos_mapping.json')
+ENTITY_MAPPING = load_mapping_from_json('entity_mapping.json')
+SENTIMENT_MAPPING = load_mapping_from_json('sentiment_mapping.json')
 
 class Visualizer:
     @staticmethod
@@ -300,7 +225,9 @@ class Visualizer:
         
         # 繪製條形圖 - 移除情感得分
         plt.figure(figsize=figsize)
-        categories = [SENTIMENT_MAPPING['positive'], SENTIMENT_MAPPING['negative'], SENTIMENT_MAPPING['neutral']]
+        categories = [SENTIMENT_MAPPING.get('positive', '正面情感'), 
+                     SENTIMENT_MAPPING.get('negative', '負面情感'), 
+                     SENTIMENT_MAPPING.get('neutral', '中性情感')]
         values = [positive, negative, neutral]
         colors = ['green', 'red', 'blue']
         
@@ -395,7 +322,7 @@ class Visualizer:
         plt.close()
     
     @staticmethod
-    def create_visualization_report(results, output_dir='visualization', prefix='', font_path=None):
+    def create_visualization_report(results, output_dir='visualization', prefix='', font_path=None, dpi=300):
         """創建完整的可視化報告
         
         將所有分析結果圖表保存到指定目錄
@@ -472,3 +399,277 @@ class Visualizer:
             )
         
         return output_dir
+    
+    @staticmethod
+    def plot_advanced_word_frequency(word_freq, top_n=20, categories=None, exclude_words=None, 
+                                   title='詞頻統計分析', save_path=None, figsize=(14, 8), 
+                                   sort_by='frequency', plot_type='horizontal', color_map='viridis'):
+        """
+        繪製高級詞頻可視化，支持更多自定義選項
+        
+        Parameters:
+        -----------
+        word_freq : dict
+            詞語頻率字典，格式為 {word: frequency}
+        top_n : int
+            顯示頻率最高的前N個詞
+        categories : dict
+            詞語分類字典，格式為 {category_name: [word1, word2, ...]}
+        exclude_words : list
+            需要排除的詞語列表
+        title : str
+            圖表標題
+        save_path : str
+            保存路徑，若為None則不保存
+        figsize : tuple
+            圖表尺寸
+        sort_by : str
+            排序方式，可選 'frequency'(頻率), 'alphabetical'(字母順序), 'length'(詞長)
+        plot_type : str
+            圖表類型，可選 'horizontal'(水平條形圖), 'vertical'(垂直條形圖), 'pie'(餅圖)
+        color_map : str
+            顏色映射，例如 'viridis', 'plasma', 'inferno', 'magma', 'cividis'
+        
+        Returns:
+        --------
+        bool
+            是否成功生成圖表
+        """
+        # 過濾排除詞
+        if exclude_words:
+            word_freq = {word: freq for word, freq in word_freq.items() if word not in exclude_words}
+        
+        # 按指定方式排序
+        if sort_by == 'frequency':
+            sorted_words = sorted(word_freq.items(), key=lambda x: x[1], reverse=True)
+        elif sort_by == 'alphabetical':
+            sorted_words = sorted(word_freq.items(), key=lambda x: x[0])
+        elif sort_by == 'length':
+            sorted_words = sorted(word_freq.items(), key=lambda x: len(x[0]), reverse=True)
+        else:
+            sorted_words = sorted(word_freq.items(), key=lambda x: x[1], reverse=True)
+            
+        # 取前N個詞
+        top_words = dict(sorted_words[:top_n])
+        
+        # 設置顏色
+        cmap = plt.get_cmap(color_map)
+        
+        plt.figure(figsize=figsize)
+        
+        # 基於分類繪圖
+        if categories and plot_type != 'pie':
+            # 初始化分類數據
+            category_data = {}
+            uncategorized_words = []
+            
+            # 將詞語按分類組織
+            for word, freq in top_words.items():
+                categorized = False
+                for category_name, word_list in categories.items():
+                    if word in word_list:
+                        if category_name not in category_data:
+                            category_data[category_name] = []
+                        category_data[category_name].append((word, freq))
+                        categorized = True
+                        break
+                
+                if not categorized:
+                    uncategorized_words.append((word, freq))
+            
+            # 添加未分類詞語
+            if uncategorized_words:
+                category_data['其他'] = uncategorized_words
+            
+            # 為每個分類創建子圖
+            fig, axes = plt.subplots(len(category_data), 1, figsize=figsize)
+            fig.suptitle(title, fontsize=16)
+            
+            for idx, (category_name, word_data) in enumerate(category_data.items()):
+                ax = axes[idx] if len(category_data) > 1 else axes
+                
+                words = [w[0] for w in word_data]
+                freqs = [w[1] for w in word_data]
+                
+                if plot_type == 'horizontal':
+                    bars = ax.barh(words, freqs, color=cmap(idx/len(category_data)))
+                else:  # vertical
+                    bars = ax.bar(words, freqs, color=cmap(idx/len(category_data)))
+                    plt.setp(ax.get_xticklabels(), rotation=45, ha='right')
+                
+                # 添加數值標籤
+                for bar in bars:
+                    if plot_type == 'horizontal':
+                        ax.text(bar.get_width() + 0.1, bar.get_y() + bar.get_height()/2, 
+                                f'{bar.get_width()}', va='center')
+                    else:
+                        ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.1, 
+                                f'{bar.get_height()}', ha='center')
+                
+                ax.set_title(f"{category_name} ({len(word_data)}詞)")
+                
+                if plot_type == 'horizontal':
+                    ax.set_xlabel('頻率')
+                else:
+                    ax.set_ylabel('頻率')
+            
+            plt.tight_layout(rect=[0, 0, 1, 0.95])  # 修正標題和圖表的間距
+            
+        else:  # 不分類或餅圖
+            if plot_type == 'pie':
+                # 繪製餅圖
+                plt.pie(list(top_words.values()), labels=list(top_words.keys()),
+                       autopct='%1.1f%%', colors=[cmap(i/len(top_words)) for i in range(len(top_words))])
+                plt.axis('equal')  # 確保餅圖為圓形
+                plt.title(title)
+            
+            elif plot_type == 'horizontal':
+                # 繪製水平條形圖
+                with plt.style.context('fast'):
+                    ax = sns.barplot(x=list(top_words.values()), y=list(top_words.keys()), 
+                                    palette=color_map)
+                
+                # 添加數值標籤
+                for i, v in enumerate(list(top_words.values())):
+                    ax.text(v + 0.1, i, str(v), va='center')
+                
+                plt.title(title)
+                plt.xlabel('頻率')
+                plt.ylabel('詞語')
+                
+            else:  # vertical
+                # 繪製垂直條形圖
+                with plt.style.context('fast'):
+                    ax = sns.barplot(x=list(top_words.keys()), y=list(top_words.values()),
+                                    palette=color_map)
+                
+                # 添加數值標籤
+                for i, v in enumerate(list(top_words.values())):
+                    ax.text(i, v + 0.1, str(v), ha='center')
+                
+                plt.title(title)
+                plt.ylabel('頻率')
+                plt.xlabel('詞語')
+                plt.xticks(rotation=45, ha='right')
+            
+            plt.tight_layout()
+        
+        # 保存圖表
+        if save_path:
+            os.makedirs(os.path.dirname(os.path.abspath(save_path)), exist_ok=True)
+            plt.savefig(save_path, dpi=300, bbox_inches='tight')
+            
+        plt.close()
+        return True
+    
+    @staticmethod
+    def compare_word_frequencies(freq_data_dict, top_n=15, title='詞頻比較', save_path=None, figsize=(14, 8)):
+        """
+        比較多個文本或時期的詞頻
+        
+        Parameters:
+        -----------
+        freq_data_dict : dict
+            包含多個詞頻數據的字典，格式為 {data_name: {word: frequency, ...}, ...}
+        top_n : int
+            顯示的詞語數量
+        title : str
+            圖表標題
+        save_path : str
+            保存路徑
+        figsize : tuple
+            圖表尺寸
+            
+        Returns:
+        --------
+        bool
+            是否成功生成圖表
+        """
+        # 合併所有詞語
+        all_words = set()
+        for data in freq_data_dict.values():
+            all_words.update(data.keys())
+        
+        # 找出在所有數據中出現頻率最高的詞
+        word_total_freq = {}
+        for word in all_words:
+            word_total_freq[word] = sum(data.get(word, 0) for data in freq_data_dict.values())
+        
+        # 選取頻率最高的詞
+        top_words = dict(sorted(word_total_freq.items(), key=lambda x: x[1], reverse=True)[:top_n])
+        
+        # 準備繪圖數據
+        data_names = list(freq_data_dict.keys())
+        words = list(top_words.keys())
+        
+        # 創建數據矩陣
+        data_matrix = []
+        for word in words:
+            row = [data.get(word, 0) for data in freq_data_dict.values()]
+            data_matrix.append(row)
+        
+        # 創建DataFrame
+        import pandas as pd
+        df = pd.DataFrame(data_matrix, index=words, columns=data_names)
+        
+        # 繪製熱圖
+        plt.figure(figsize=figsize)
+        ax = sns.heatmap(df, annot=True, fmt='d', cmap='YlGnBu')
+        
+        plt.title(title)
+        plt.tight_layout()
+        
+        # 保存圖表
+        if save_path:
+            os.makedirs(os.path.dirname(os.path.abspath(save_path)), exist_ok=True)
+            plt.savefig(save_path, dpi=300, bbox_inches='tight')
+            
+        plt.close()
+        return True
+    
+    @staticmethod
+    def plot_word_frequency_trends(time_series_data, words, title='詞頻趨勢', save_path=None, figsize=(14, 6)):
+        """
+        繪製詞頻隨時間變化的趨勢圖
+        
+        Parameters:
+        -----------
+        time_series_data : dict
+            時間序列詞頻數據，格式為 {time_point: {word: frequency, ...}, ...}
+        words : list
+            要顯示趨勢的詞語列表
+        title : str
+            圖表標題
+        save_path : str
+            保存路徑
+        figsize : tuple
+            圖表尺寸
+            
+        Returns:
+        --------
+        bool
+            是否成功生成圖表
+        """
+        # 整理數據
+        time_points = sorted(time_series_data.keys())
+        
+        plt.figure(figsize=figsize)
+        
+        # 為每個詞繪製一條線
+        for word in words:
+            freq_over_time = [time_series_data[t].get(word, 0) for t in time_points]
+            plt.plot(time_points, freq_over_time, marker='o', linewidth=2, label=word)
+        
+        plt.title(title)
+        plt.xlabel('時間點')
+        plt.ylabel('詞頻')
+        plt.legend()
+        plt.grid(True, linestyle='--', alpha=0.7)
+        
+        # 保存圖表
+        if save_path:
+            os.makedirs(os.path.dirname(os.path.abspath(save_path)), exist_ok=True)
+            plt.savefig(save_path, dpi=300, bbox_inches='tight')
+            
+        plt.close()
+        return True

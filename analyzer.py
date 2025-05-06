@@ -20,25 +20,42 @@ class ChineseTextAnalyzer:
         # 載入自訂詞典或默認詞典
         if custom_dict_path:
             jieba.load_userdict(custom_dict_path)
+            # 計算預設詞典詞數
+            dict_words = self._count_words_in_dict(custom_dict_path)
+            print(f"已載入預設詞典: {custom_dict_path}, 共 {dict_words} 個詞")
         else:
             default_dict_path = os.path.join(self.resources_path, 'custom_dict.txt')
             if os.path.exists(default_dict_path):
                 jieba.load_userdict(default_dict_path)
-                print(f"已載入預設詞典: {default_dict_path}")
+                # 計算預設詞典詞數
+                dict_words = self._count_words_in_dict(default_dict_path)
+                print(f"已載入預設詞典: {default_dict_path}, 共 {dict_words} 個詞")
         
         # 載入停用詞
         self.stopwords = set()
         if stopwords_path:
             self.load_stopwords(stopwords_path)
+            print(f"已載入預設停用詞表: {stopwords_path}, 共 {len(self.stopwords)} 個詞")
         else:
             default_stopwords_path = os.path.join(self.resources_path, 'chinese_stopwords.txt')
             if os.path.exists(default_stopwords_path):
                 self.load_stopwords(default_stopwords_path)
-                print(f"已載入預設停用詞表: {default_stopwords_path}")
+                print(f"已載入預設停用詞表: {default_stopwords_path}, 共 {len(self.stopwords)} 個詞")
         
         # 載入情感詞典
         self.positive_words = self._load_sentiment_words('positive_words.txt')
         self.negative_words = self._load_sentiment_words('negative_words.txt')
+    
+    def _count_words_in_dict(self, dict_path):
+        """計算詞典中的詞數（排除註釋行）"""
+        count = 0
+        with open(dict_path, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                # 跳過空行和以#開頭的註釋行
+                if line and not line.startswith('#'):
+                    count += 1
+        return count
     
     def _load_sentiment_words(self, filename):
         """載入情感詞典"""

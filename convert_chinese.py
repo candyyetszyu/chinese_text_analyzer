@@ -9,8 +9,43 @@ import os
 import sys
 import argparse
 
-def convert_file(file_path, backup=True):
-    """Convert a file from simplified to traditional Chinese"""
+def convert_text(text, conversion='s2t'):
+    """Convert text between simplified and traditional Chinese
+    
+    Args:
+        text (str): The text to convert
+        conversion (str): 's2t' for simplified to traditional, 't2s' for traditional to simplified
+        
+    Returns:
+        str: The converted text
+    """
+    try:
+        import opencc
+    except ImportError:
+        print("請先安裝 OpenCC: pip install opencc-python-reimplemented")
+        return text
+    
+    try:
+        # Convert the text
+        converter = opencc.OpenCC(conversion)
+        converted_text = converter.convert(text)
+        return converted_text
+    
+    except Exception as e:
+        print(f"轉換文本時出錯: {str(e)}")
+        return text
+
+def convert_file(file_path, backup=True, conversion='s2t'):
+    """Convert a file between simplified and traditional Chinese
+    
+    Args:
+        file_path (str): Path to the file to convert
+        backup (bool): Whether to create a backup of the original file
+        conversion (str): 's2t' for simplified to traditional, 't2s' for traditional to simplified
+        
+    Returns:
+        bool: True if conversion was successful, False otherwise
+    """
     try:
         import opencc
     except ImportError:
@@ -30,23 +65,35 @@ def convert_file(file_path, backup=True):
         with open(file_path, 'r', encoding='utf-8') as f:
             content = f.read()
         
-        # Convert to traditional Chinese
-        converter = opencc.OpenCC('s2t')
-        traditional_content = converter.convert(content)
+        # Convert between Chinese variants
+        converter = opencc.OpenCC(conversion)
+        converted_content = converter.convert(content)
         
         # Write back to the file
         with open(file_path, 'w', encoding='utf-8') as f:
-            f.write(traditional_content)
+            f.write(converted_content)
         
-        print(f"已將 {file_path} 轉換為繁體中文")
+        conversion_type = "繁體中文" if conversion == 's2t' else "簡體中文"
+        print(f"已將 {file_path} 轉換為{conversion_type}")
         return True
     
     except Exception as e:
         print(f"轉換 {file_path} 時出錯: {str(e)}")
         return False
 
-def convert_directory(dir_path, extensions=None, recursive=False, backup=True):
-    """Convert all files in a directory"""
+def convert_directory(dir_path, extensions=None, recursive=False, backup=True, conversion='s2t'):
+    """Convert all files in a directory
+    
+    Args:
+        dir_path (str): Path to the directory containing files to convert
+        extensions (list): List of file extensions to convert
+        recursive (bool): Whether to process subdirectories
+        backup (bool): Whether to create backups of the original files
+        conversion (str): 's2t' for simplified to traditional, 't2s' for traditional to simplified
+        
+    Returns:
+        tuple: (number of files converted, number of files that failed)
+    """
     if extensions is None:
         extensions = ['.py', '.txt', '.md', '.json']
     
@@ -67,23 +114,28 @@ def convert_directory(dir_path, extensions=None, recursive=False, backup=True):
     
     # Convert each file
     for file_path in files:
-        if convert_file(file_path, backup):
+        if convert_file(file_path, backup, conversion):
             converted += 1
         else:
             failed += 1
     
-    print(f"\n轉換完成: {converted} 個文件已轉換，{failed} 個文件轉換失敗")
+    conversion_type = "繁體中文" if conversion == 's2t' else "簡體中文"
+    print(f"\n轉換完成: {converted} 個文件已轉換為{conversion_type}，{failed} 個文件轉換失敗")
     return converted, failed
 
 def main():
-    parser = argparse.ArgumentParser(description="將簡體中文轉換為繁體中文")
+    parser = argparse.ArgumentParser(description="繁簡體中文轉換工具")
     parser.add_argument('--file', '-f', help="要轉換的文件路徑")
     parser.add_argument('--dir', '-d', help="要轉換的目錄路徑")
     parser.add_argument('--ext', '-e', help="要轉換的文件擴展名，用逗號分隔 (例如: .py,.txt)")
     parser.add_argument('--recursive', '-r', action='store_true', help="遞歸處理子目錄")
     parser.add_argument('--no-backup', action='store_true', help="不創建備份文件")
+    parser.add_argument('--t2s', action='store_true', help="繁體轉換為簡體（默認為簡體轉繁體）")
     
     args = parser.parse_args()
+    
+    # Set conversion direction
+    conversion = 't2s' if args.t2s else 's2t'
     
     # Parse extensions if provided
     extensions = None
@@ -97,16 +149,17 @@ def main():
     
     # Convert file or directory
     if args.file:
-        convert_file(args.file, not args.no_backup)
+        convert_file(args.file, not args.no_backup, conversion)
     elif args.dir:
-        convert_directory(args.dir, extensions, args.recursive, not args.no_backup)
+        convert_directory(args.dir, extensions, args.recursive, not args.no_backup, conversion)
     else:
         # If no arguments provided, show help
         parser.print_help()
         print("\n範例使用方法:")
-        print("  轉換單個文件:   python convert_chinese.py --file visualization.py")
-        print("  轉換整個目錄:   python convert_chinese.py --dir . --ext .py")
-        print("  轉換整個專案:   python convert_chinese.py --dir . --recursive")
+        print("  轉換單個文件 (簡體到繁體): python convert_chinese.py --file visualization.py")
+        print("  轉換單個文件 (繁體到簡體): python convert_chinese.py --file visualization.py --t2s")
+        print("  轉換整個目錄:             python convert_chinese.py --dir . --ext .py")
+        print("  轉換整個專案:             python convert_chinese.py --dir . --recursive")
 
 if __name__ == "__main__":
     main()

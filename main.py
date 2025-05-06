@@ -6,7 +6,7 @@ from analyzer import ChineseTextAnalyzer
 from file_utils import FileUtils
 from visualization import Visualizer
 
-def analyze_single_file(file_path, analyzer, output_folder, export_formats, visualize=True, font_path=None):
+def analyze_single_file(file_path, analyzer, output_folder, export_formats, visualize=True, font_path=None, advanced_viz=None):
     """分析單個文件並保存結果"""
     try:
         # 讀取文件
@@ -47,6 +47,48 @@ def analyze_single_file(file_path, analyzer, output_folder, export_formats, visu
                 prefix=base_name,
                 font_path=font_path
             )
+            
+            # 進階詞頻可視化
+            if advanced_viz and 'word_frequency' in results:
+                # 創建高級詞頻視覺化目錄
+                advanced_viz_folder = os.path.join(viz_folder, 'advanced')
+                os.makedirs(advanced_viz_folder, exist_ok=True)
+                
+                # 詞頻統計餅圖
+                if 'pie' in advanced_viz:
+                    pie_path = os.path.join(advanced_viz_folder, f"{base_name}_word_freq_pie.png")
+                    Visualizer.plot_advanced_word_frequency(
+                        results['word_frequency'],
+                        top_n=15,
+                        title='詞頻分布餅圖',
+                        save_path=pie_path,
+                        plot_type='pie'
+                    )
+                    print(f"已生成詞頻餅圖: {pie_path}")
+                
+                # 詞頻垂直條形圖
+                if 'vertical' in advanced_viz:
+                    vert_path = os.path.join(advanced_viz_folder, f"{base_name}_word_freq_vertical.png")
+                    Visualizer.plot_advanced_word_frequency(
+                        results['word_frequency'],
+                        title='詞頻垂直條形圖',
+                        save_path=vert_path,
+                        plot_type='vertical',
+                        color_map='plasma'
+                    )
+                    print(f"已生成詞頻垂直條形圖: {vert_path}")
+                
+                # 按詞長度排序的詞頻圖
+                if 'length' in advanced_viz:
+                    len_path = os.path.join(advanced_viz_folder, f"{base_name}_word_by_length.png")
+                    Visualizer.plot_advanced_word_frequency(
+                        results['word_frequency'],
+                        title='按詞長度排序的詞頻圖',
+                        save_path=len_path,
+                        sort_by='length',
+                        color_map='magma'
+                    )
+                    print(f"已生成按詞長度排序的詞頻圖: {len_path}")
         
         return results
     except Exception as e:
@@ -67,6 +109,7 @@ def main():
     parser.add_argument('--extensions', '-e', default='.txt,.csv,.html,.md', help='要處理的文件擴展名（批量模式下），逗號分隔')
     parser.add_argument('--font', help='中文字體路徑 (用於詞雲圖生成)')
     parser.add_argument('--debug', action='store_true', help='啟用調試模式，顯示詳細錯誤信息')
+    parser.add_argument('--advanced-viz', '-av', help='進階詞頻可視化選項，逗號分隔 (pie,vertical,length)')
     
     # 顯示幫助
     if len(sys.argv) == 1:
@@ -90,10 +133,13 @@ def main():
     # 解析文件擴展名
     file_extensions = [ext if ext.startswith('.') else f'.{ext}' for ext in args.extensions.split(',')]
     
+    # 解析進階詞頻可視化選項
+    advanced_viz = args.advanced_viz.split(',') if args.advanced_viz else None
+    
     # 判斷輸入是文件還是目錄
     if os.path.isfile(args.input):
         # 處理單個文件
-        results = analyze_single_file(args.input, analyzer, args.output, export_formats, not args.no_viz, args.font)
+        results = analyze_single_file(args.input, analyzer, args.output, export_formats, not args.no_viz, args.font, advanced_viz)
         
         # 可視化（如果需要）
         if not args.no_viz and 'error' not in results:
