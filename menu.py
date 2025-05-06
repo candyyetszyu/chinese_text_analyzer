@@ -362,12 +362,23 @@ class TextAnalyzerMenu:
         filename = os.path.basename(file_path)
         base_name = os.path.splitext(filename)[0]
         
-        print(f"文件大小: {len(text)} 字符")
+        # 計算文本基本信息
+        total_chars = len(text)
+        chinese_chars = self.analyzer.count_chinese_characters(text)
+        
+        print(f"文件大小: {total_chars} 字符")
+        print(f"中文字符數: {chinese_chars} 個")
+        print(f"中文字符比例: {chinese_chars/total_chars*100:.2f}%")
         print("正在進行分詞和基礎分析...")
         
         # 進行基本分析
         try:
             results = self.analyzer.analyze_text(text)
+            
+            # 添加文本字符統計信息
+            results['total_characters'] = total_chars
+            results['chinese_characters'] = chinese_chars
+            results['chinese_character_ratio'] = round(chinese_chars/total_chars*100, 2)
             
             # 添加高級分析
             print("正在進行情感分析...")
@@ -530,6 +541,15 @@ class TextAnalyzerMenu:
                 try:
                     # 讀取文件
                     text = FileUtils.read_file(file_path)
+                    
+                    # 計算文本字符統計信息
+                    total_chars = len(text)
+                    chinese_chars = self.analyzer.count_chinese_characters(text)
+                    result['total_characters'] = total_chars
+                    result['chinese_characters'] = chinese_chars
+                    result['chinese_character_ratio'] = round(chinese_chars/total_chars*100, 2)
+                    
+                    print(f"{filename}: 總字符 {total_chars}, 中文字符 {chinese_chars} ({result['chinese_character_ratio']}%)")
                     
                     # 添加高級分析
                     result['sentiment'] = self.analyzer.analyze_sentiment(text)

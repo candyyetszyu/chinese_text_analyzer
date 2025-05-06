@@ -274,6 +274,12 @@ class ChineseTextAnalyzer:
             print("請安裝OpenCC: pip install opencc-python-reimplemented")
             return text
     
+    def count_chinese_characters(self, text):
+        """計算文本中的中文字符數量"""
+        # 使用正則表達式匹配中文字符 (Unicode 範圍: \u4e00-\u9fff)
+        chinese_chars = re.findall(r'[\u4e00-\u9fff]', text)
+        return len(chinese_chars)
+    
     def keyword_extraction(self, text, top_k=20):
         """提取文本關鍵詞"""
         keywords = jieba.analyse.extract_tags(text, topK=top_k, withWeight=True)

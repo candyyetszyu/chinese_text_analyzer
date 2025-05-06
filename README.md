@@ -138,6 +138,7 @@ python main.py --input input_texts/sample.txt --output results
 - **關鍵詞提取**：基於 TF-IDF 算法提取文本關鍵詞
 - **文本摘要**：自動生成文本摘要
 - **N-gram分析**：識別文本中的常見詞組
+- **中文字符統計**：計算文本中的中文字符數量及比例
 
 ### 繁簡體轉換
 
