@@ -694,4 +694,4 @@ python main.py --input sample.txt --advanced-viz pie,vertical,length
 - **數據庫集成**：添加與常見數據庫系統的連接器，便於大規模文本處理
 
 ## 鳴謝
-此程式由Claude 3.7 Sonnet及Deepseek協助完成。
+此程式由Claude 3.7 Sonnet及Deepseek協助完成。# chinese_text_analyzer_web
