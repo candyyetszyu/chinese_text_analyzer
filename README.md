@@ -1,423 +1,423 @@
 # Chinese Text Analyzer
 
-一個中文文本分析工具，適用於語言研究、內容分析和文本挖掘。
+A Chinese text analysis tool for language research, content analysis, and text mining.
 
-## 簡介
+## Introduction
 
-Chinese Text Analyzer 是一個用 Python 開發的中文文本分析工具，提供詞頻統計、詞性分析、命名實體識別、情感分析等功能，並支援繁簡體中文轉換和視覺化結果展示。
+Chinese Text Analyzer is a Python-based Chinese text analysis tool that provides word frequency statistics, part-of-speech analysis, named entity recognition, sentiment analysis, and other features. It supports Simplified and Traditional Chinese conversion and visualization of results.
 
-## 目錄
+## Table of Contents
 
-- [簡介](#簡介)
-- [專案結構](#專案結構)
-- [使用方式](#使用方式)
-  - [互動式菜單介面（推薦）](#互動式菜單介面推薦)
-  - [命令行界面](#命令行界面)
-- [主要功能](#主要功能)
-  - [核心分析功能](#核心分析功能)
-  - [繁簡體轉換](#繁簡體轉換)
-  - [視覺化功能](#視覺化功能)
-    - [進階詞頻視覺化](#進階詞頻視覺化)
-  - [圖像解析度設置](#圖像解析度設置)
-- [文本處理能力](#文本處理能力)
-  - [處理時間估算](#處理時間估算)
-  - [加速處理方法](#加速處理方法)
-- [環境設置](#環境設置)
-  - [必要依賴](#必要依賴)
-  - [使用虛擬環境（推薦）](#使用虛擬環境推薦)
-- [中文字體配置](#中文字體配置)
-  - [macOS中文字體問題解決方案](#macos中文字體問題解決方案)
-    - [使用菜單界面自動檢測系統字體](#使用菜單界面自動檢測系統字體)
-    - [手動指定字體](#手動指定字體)
-    - [使用字體配置工具](#使用字體配置工具)
-- [預設資源](#預設資源)
-  - [停用詞和自定義詞典](#停用詞和自定義詞典)
-  - [情感詞典](#情感詞典)
-  - [標籤映射文件](#標籤映射文件)
-- [API 使用指南](#api-使用指南)
-  - [入門指南（適合編程初學者）](#入門指南適合編程初學者)
-  - [常見問題與解決方案](#常見問題與解決方案)
-  - [進階API示例（適合有編程經驗的用戶）](#進階api示例適合有編程經驗的用戶)
-- [命令行參數參考](#命令行參數參考)
-  - [基礎參數（適合初學者）](#基礎參數適合初學者)
-  - [給初學者的命令行指南](#給初學者的命令行指南)
-  - [命令行使用技巧](#命令行使用技巧)
-  - [進階參數（適合熟悉命令行的用戶）](#進階參數適合熟悉命令行的用戶)
-  - [常見命令行組合範例](#常見命令行組合範例)
-- [未來擴展建議](#未來擴展建議)
-  - [內容分析擴展](#內容分析擴展)
-  - [技術改進](#技術改進)
-  - [用戶界面優化](#用戶界面優化)
-  - [集成與擴展性](#集成與擴展性)
-- [鳴謝](#鳴謝)
+- [Introduction](#introduction)
+- [Project Structure](#project-structure)
+- [Usage](#usage)
+  - [Interactive Menu Interface (Recommended)](#interactive-menu-interface-recommended)
+  - [Command Line Interface](#command-line-interface)
+- [Main Features](#main-features)
+  - [Core Analysis Features](#core-analysis-features)
+  - [Traditional and Simplified Chinese Conversion](#traditional-and-simplified-chinese-conversion)
+  - [Visualization Features](#visualization-features)
+    - [Advanced Word Frequency Visualization](#advanced-word-frequency-visualization)
+  - [Image Resolution Settings](#image-resolution-settings)
+- [Text Processing Capabilities](#text-processing-capabilities)
+  - [Processing Time Estimation](#processing-time-estimation)
+  - [Methods to Accelerate Processing](#methods-to-accelerate-processing)
+- [Environment Setup](#environment-setup)
+  - [Required Dependencies](#required-dependencies)
+  - [Using Virtual Environment (Recommended)](#using-virtual-environment-recommended)
+- [Chinese Font Configuration](#chinese-font-configuration)
+  - [macOS Chinese Font Issue Solutions](#macos-chinese-font-issue-solutions)
+    - [Using Menu Interface for Automatic System Font Detection](#using-menu-interface-for-automatic-system-font-detection)
+    - [Manual Font Specification](#manual-font-specification)
+    - [Using Font Configuration Tool](#using-font-configuration-tool)
+- [Default Resources](#default-resources)
+  - [Stopwords and Custom Dictionary](#stopwords-and-custom-dictionary)
+  - [Sentiment Dictionary](#sentiment-dictionary)
+  - [Tag Mapping Files](#tag-mapping-files)
+- [API Usage Guide](#api-usage-guide)
+  - [Getting Started Guide (For Programming Beginners)](#getting-started-guide-for-programming-beginners)
+  - [Common Issues and Solutions](#common-issues-and-solutions)
+  - [Advanced API Examples (For Experienced Users)](#advanced-api-examples-for-experienced-users)
+- [Command Line Parameter Reference](#command-line-parameter-reference)
+  - [Basic Parameters (For Beginners)](#basic-parameters-for-beginners)
+  - [Command Line Guide for Beginners](#command-line-guide-for-beginners)
+  - [Command Line Usage Tips](#command-line-usage-tips)
+  - [Advanced Parameters (For Command Line Experienced Users)](#advanced-parameters-for-command-line-experienced-users)
+  - [Common Command Line Combination Examples](#common-command-line-combination-examples)
+- [Future Enhancement Suggestions](#future-enhancement-suggestions)
+  - [Content Analysis Extensions](#content-analysis-extensions)
+  - [Technical Improvements](#technical-improvements)
+  - [User Interface Optimization](#user-interface-optimization)
+  - [Integration and Extensibility](#integration-and-extensibility)
+- [Acknowledgments](#acknowledgments)
 
-## 專案結構
+## Project Structure
 
 ```
 chinese_text_analyzer/
-├── analyzer.py        # 核心分析功能實現
-├── file_utils.py      # 文件操作工具類
-├── main.py            # 命令行界面和主程序入口
-├── menu.py            # 互動式菜單介面
-├── visualization.py   # 數據視覺化功能
-├── setup_chinese_font.py  # 中文字體配置工具
-├── convert_chinese.py # 繁簡體中文轉換工具
-├── convert_to_traditional.py # 簡體轉繁體工具（備用）
-├── README.md          # 專案說明文檔
-├── resources/         # 預設資源目錄
-│   ├── chinese_stopwords.txt  # 中文停用詞表
-│   ├── custom_dict.txt        # 自定義詞典
-│   ├── positive_words.txt     # 正面情感詞典
-│   ├── negative_words.txt     # 負面情感詞典
-│   └── mappings/              # 詞性和實體映射文件
-│       ├── pos_mapping.json   # 詞性映射
-│       ├── entity_mapping.json # 實體類型映射
-│       └── sentiment_mapping.json # 情感標籤映射
-├── input_texts/       # 輸入文本文件目錄
-└── results/           # 分析結果輸出目錄
-    └── visualizations/      # 視覺化圖表目錄
-        └── advanced/        # 進階詞頻視覺化目錄
+├── analyzer.py        # Core analysis functionality implementation
+├── file_utils.py      # File operation utility class
+├── main.py            # Command line interface and main program entry
+├── menu.py            # Interactive menu interface
+├── visualization.py   # Data visualization functionality
+├── setup_chinese_font.py  # Chinese font configuration tool
+├── convert_chinese.py # Traditional/Simplified Chinese conversion tool
+├── convert_to_traditional.py # Simplified to Traditional conversion tool (backup)
+├── README.md          # Project documentation
+├── resources/         # Default resources directory
+│   ├── chinese_stopwords.txt  # Chinese stopwords list
+│   ├── custom_dict.txt        # Custom dictionary
+│   ├── positive_words.txt     # Positive sentiment dictionary
+│   ├── negative_words.txt     # Negative sentiment dictionary
+│   └── mappings/              # POS and entity mapping files
+│       ├── pos_mapping.json   # Part-of-speech mapping
+│       ├── entity_mapping.json # Entity type mapping
+│       └── sentiment_mapping.json # Sentiment label mapping
+├── input_texts/       # Input text files directory
+└── results/           # Analysis results output directory
+    └── visualizations/      # Visualization charts directory
+        └── advanced/        # Advanced word frequency visualization directory
 ```
 
-## 使用方式
+## Usage
 
-### 互動式菜單介面（推薦）
+### Interactive Menu Interface (Recommended)
 
-本工具提供了一個方便的互動式菜單介面，適合不熟悉命令行參數的用戶：
+This tool provides a convenient interactive menu interface suitable for users unfamiliar with command line parameters:
 
 ```bash
 python menu.py
 ```
 
-啟動後，您將看到以下主菜單：
+After startup, you will see the following main menu:
 
 ```
-=== 中文文本分析工具 ===
-版本：1.0.0
-=========================
+=== Chinese Text Analysis Tool ===
+Version: 1.0.0
+=================================
 
-主菜單:
-1. 分析單個文件
-2. 批量分析文件
-3. 繁簡體轉換
-4. 設置選項
-5. 查看當前設置
-0. 退出程序
+Main Menu:
+1. Analyze single file
+2. Batch analyze files
+3. Traditional/Simplified Chinese conversion
+4. Settings options
+5. View current settings
+0. Exit program
 ```
 
-主要功能菜單：
-- **分析單個文件**：對選定的中文文本進行全面分析
-- **批量分析文件**：一次處理多個文本文件
-- **繁簡體轉換**：進行繁簡體中文轉換（支持文本和文件）
-- **設置選項**：調整分析工具的各種參數
-- **查看當前設置**：顯示目前的配置參數
+Main feature menu:
+- **Analyze single file**: Comprehensive analysis of selected Chinese text
+- **Batch analyze files**: Process multiple text files at once
+- **Traditional/Simplified Chinese conversion**: Convert between Traditional and Simplified Chinese (supports text and files)
+- **Settings options**: Adjust various parameters of the analysis tool
+- **View current settings**: Display current configuration parameters
 
-進階選項設置包括：
-- 輸出目錄和格式設定（支持JSON、CSV、Excel）
-- 視覺化圖表控制
-- 圖像解析度（DPI）調整
-- 中文字體設置（自動檢測系統字體）
-- 自定義詞典和停用詞表配置
+Advanced option settings include:
+- Output directory and format settings (supports JSON, CSV, Excel)
+- Visualization chart control
+- Image resolution (DPI) adjustment
+- Chinese font settings (automatic system font detection)
+- Custom dictionary and stopwords list configuration
 
-### 命令行界面
+### Command Line Interface
 
-除了菜單介面外，本工具也保留了完整的命令行界面，適合進階用戶或批處理需求：
+In addition to the menu interface, this tool also retains a complete command line interface, suitable for advanced users or batch processing needs:
 
 ```bash
 python main.py --input input_texts/sample.txt --output results
 ```
 
-## 主要功能
+## Main Features
 
-### 核心分析功能
+### Core Analysis Features
 
-- **詞頻分析**：統計文本中各詞語出現的頻率
-- **詞性分析**：分析文本中不同詞性的分佈
-- **命名實體識別**：識別文本中的人名、地名、機構名等
-- **情感分析**：分析文本的情感傾向（正面、負面或中性）
-- **關鍵詞提取**：基於 TF-IDF 算法提取文本關鍵詞
-- **文本摘要**：自動生成文本摘要
-- **N-gram分析**：識別文本中的常見詞組
-- **中文字符統計**：計算文本中的中文字符數量及比例
+- **Word Frequency Analysis**: Statistics of word occurrence frequency in text
+- **Part-of-Speech Analysis**: Analysis of the distribution of different parts of speech in text
+- **Named Entity Recognition**: Identification of person names, place names, organization names, etc. in text
+- **Sentiment Analysis**: Analysis of text sentiment tendency (positive, negative, or neutral)
+- **Keyword Extraction**: Extract text keywords based on TF-IDF algorithm
+- **Text Summarization**: Automatically generate text summaries
+- **N-gram Analysis**: Identify common phrases in text
+- **Chinese Character Statistics**: Calculate the number and proportion of Chinese characters in text
 
-### 繁簡體轉換
+### Traditional and Simplified Chinese Conversion
 
-本工具提供完整的繁簡體中文轉換功能：
+This tool provides complete Traditional and Simplified Chinese conversion functionality:
 
-- **互動式轉換**：通過菜單界面直接轉換文本或文件
-- **文本轉換**：直接在界面中輸入文本並轉換
-- **文件轉換**：轉換整個文件，支持多種格式
-- **批量轉換**：支持批量處理整個目錄中的文件
-- **雙向轉換**：支持簡體→繁體和繁體→簡體轉換
+- **Interactive Conversion**: Direct text or file conversion through menu interface
+- **Text Conversion**: Directly input text in the interface and convert
+- **File Conversion**: Convert entire files, supporting multiple formats
+- **Batch Conversion**: Support batch processing of files in entire directories
+- **Bidirectional Conversion**: Support Simplified→Traditional and Traditional→Simplified conversion
 
-通過命令行使用繁簡體轉換工具：
+Using Traditional/Simplified Chinese conversion tool through command line:
 
 ```bash
-# 將單個文件從簡體轉為繁體
+# Convert single file from Simplified to Traditional
 python convert_chinese.py --file your_file.txt
 
-# 將單個文件從繁體轉為簡體
+# Convert single file from Traditional to Simplified
 python convert_chinese.py --file your_file.txt --t2s
 
-# 轉換整個目錄中的特定類型文件
+# Convert specific file types in entire directory
 python convert_chinese.py --dir your_folder --ext .txt,.md
 ```
 
-### 視覺化功能
+### Visualization Features
 
-本工具生成多種視覺化圖表，幫助直觀理解文本分析結果：
+This tool generates various visualization charts to help intuitively understand text analysis results:
 
-- **詞頻統計圖**：展示詞語使用頻率
-- **詞雲圖**：以視覺化方式展示高頻詞
-- **詞性分布圖**：分析詞性結構
-- **情感分析圖**：展示文本情感傾向
-- **命名實體統計圖**：統計不同類型的命名實體
-- **關鍵詞權重圖**：展示關鍵詞的重要性
-- **N-gram頻率圖**：展示常見詞組
+- **Word Frequency Charts**: Display word usage frequency
+- **Word Clouds**: Visually display high-frequency words
+- **Part-of-Speech Distribution Charts**: Analyze grammatical structure
+- **Sentiment Analysis Charts**: Display text sentiment tendency
+- **Named Entity Statistics Charts**: Statistics of different types of named entities
+- **Keyword Weight Charts**: Display the importance of keywords
+- **N-gram Frequency Charts**: Display common phrases
 
-#### 進階詞頻視覺化
+#### Advanced Word Frequency Visualization
 
-本工具還提供多種進階詞頻視覺化選項：
+This tool also provides various advanced word frequency visualization options:
 
-- **詞頻分布餅圖**：展示詞語分布比例
-- **詞頻垂直條形圖**：比標準水平條形圖更適合某些分析場景
-- **按詞長度排序的詞頻圖**：展示不同長度詞語的使用頻率
+- **Word Frequency Distribution Pie Chart**: Display word distribution proportions
+- **Word Frequency Vertical Bar Chart**: More suitable for certain analysis scenarios than standard horizontal bar charts
+- **Word Frequency Chart Sorted by Word Length**: Display usage frequency of words of different lengths
 
-### 圖像解析度設置
+### Image Resolution Settings
 
-使用菜單界面或命令行參數可以調整視覺化圖表的解析度（DPI），以平衡生成速度和圖像質量：
+Using the menu interface or command line parameters can adjust the resolution (DPI) of visualization charts to balance generation speed and image quality:
 
-- **300 DPI**：高質量（默認）
-- **150 DPI**：一般用途
-- **72 DPI**：快速預覽
+- **300 DPI**: High quality (default)
+- **150 DPI**: General purpose
+- **72 DPI**: Quick preview
 
-設置DPI值可以顯著影響處理大量文件時的性能：
+Setting DPI values can significantly affect performance when processing large numbers of files:
 
 ```bash
-# 命令行中設置DPI
+# Set DPI in command line
 python main.py --input sample.txt --output results --dpi 150
 
-# 在菜單界面中設置
-4. 設置選項 > 4. 設置圖像解析度 (DPI)
+# Set in menu interface
+4. Settings Options > 4. Set Image Resolution (DPI)
 ```
 
-## 文本處理能力
+## Text Processing Capabilities
 
-本工具可處理各種規模的中文文本，從短句到長篇文章。處理效率取決於系統配置和文本規模。
+This tool can process Chinese texts of various scales, from short sentences to long articles. Processing efficiency depends on system configuration and text scale.
 
-### 處理時間估算
+### Processing Time Estimation
 
-| 文本大小 | 估計處理時間 |
+| Text Size | Estimated Processing Time |
 | --- | --- |
-| 小型文本（1-5 KB，約 500-2,500 字） | 5-10 秒 |
-| 中型文本（10-50 KB，約 5,000-25,000 字） | 20-60 秒 |
-| 大型文本（100-500 KB，約 50,000-250,000 字） | 2-5 分鐘 |
-| 超大型文本（1MB+ ，超過 500,000 字） | 10+ 分鐘 |
+| Small text (1-5 KB, about 500-2,500 characters) | 5-10 seconds |
+| Medium text (10-50 KB, about 5,000-25,000 characters) | 20-60 seconds |
+| Large text (100-500 KB, about 50,000-250,000 characters) | 2-5 minutes |
+| Extra large text (1MB+, over 500,000 characters) | 10+ minutes |
 
-### 加速處理方法
+### Methods to Accelerate Processing
 
-提高處理效率的方法：
+Methods to improve processing efficiency:
 
-1. **使用並行處理**：適用於批量處理多個文件
+1. **Use parallel processing**: Suitable for batch processing multiple files
    ```bash
-   # 命令行中啟用並行處理
+   # Enable parallel processing in command line
    python main.py --input input_folder --batch --parallel
    
-   # 在菜單界面中啟用
-   2. 批量分析文件 > 是否使用並行處理 > y
+   # Enable in menu interface
+   2. Batch analyze files > Use parallel processing? > y
    ```
 
-2. **調低視覺化解析度**：降低DPI值可大幅縮短處理時間
+2. **Lower visualization resolution**: Reducing DPI values can significantly shorten processing time
    ```bash
-   # 使用低分辨率模式以加快渲染
+   # Use low resolution mode to speed up rendering
    python main.py --input sample.txt --dpi 72
    ```
 
-3. **關閉不必要的視覺化**：選擇性生成視覺化圖表
+3. **Turn off unnecessary visualizations**: Selectively generate visualization charts
    ```bash
-   # 只生成詞雲和詞頻統計圖
+   # Only generate word cloud and word frequency charts
    python main.py --input sample.txt --viz word_frequency,wordcloud
    
-   # 在菜單界面中
-   4. 設置選項 > 3. 設置視覺化選項
+   # In menu interface
+   4. Settings Options > 3. Set Visualization Options
    ```
 
-## 環境設置
+## Environment Setup
 
-### 必要依賴
+### Required Dependencies
 
-運行此工具需要以下 Python 庫：
+Running this tool requires the following Python libraries:
 
 ```bash
 pip install jieba pandas matplotlib seaborn wordcloud xlsxwriter opencc-python-reimplemented chardet
 ```
 
-### 使用虛擬環境（推薦）
+### Using Virtual Environment (Recommended)
 
-為避免依賴衝突，建議使用虛擬環境：
+To avoid dependency conflicts, it is recommended to use a virtual environment:
 
 ```bash
-# 創建並啟動虛擬環境
+# Create and activate virtual environment
 python -m venv venv
 source venv/bin/activate  # macOS/Linux
 # venv\Scripts\activate   # Windows
 
-# 安裝依賴
+# Install dependencies
 pip install jieba pandas matplotlib seaborn wordcloud xlsxwriter opencc-python-reimplemented chardet
 ```
 
-## 中文字體配置
+## Chinese Font Configuration
 
-### macOS中文字體問題解決方案
+### macOS Chinese Font Issue Solutions
 
-在 macOS 上使用 matplotlib 顯示中文時可能遇到字體問題。本工具提供多種解決方案：
+When using matplotlib to display Chinese on macOS, font issues may be encountered. This tool provides multiple solutions:
 
-#### 使用菜單界面自動檢測系統字體
+#### Using Menu Interface for Automatic System Font Detection
 
-菜單界面會自動檢測macOS系統上的常見中文字體，並提供選擇：
+The menu interface will automatically detect common Chinese fonts on macOS systems and provide options:
 
 ```
-4. 設置選項 > 5. 設置中文字體
+4. Settings Options > 5. Set Chinese Font
 ```
 
-#### 手動指定字體
+#### Manual Font Specification
 
-指定字體路徑：
+Specify font path:
 
 ```bash
-# 命令行界面
+# Command line interface
 python main.py --input sample.txt --font /System/Library/Fonts/PingFang.ttc
 
-# 或使用菜單界面手動輸入路徑
+# Or manually input path using menu interface
 ```
 
-常見的 macOS 中文字體路徑：
+Common macOS Chinese font paths:
 - `/System/Library/Fonts/PingFang.ttc`
 - `/System/Library/Fonts/STHeiti Light.ttc`
 - `/System/Library/Fonts/STHeiti Medium.ttc`
 - `/System/Library/Fonts/Hiragino Sans GB.ttc`
 - `/System/Library/Fonts/Songti.ttc`
 
-#### 使用字體配置工具
+#### Using Font Configuration Tool
 
 ```bash
 python setup_chinese_font.py
 ```
 
-## 預設資源
+## Default Resources
 
-本工具內置多種資源文件，優化分析效果：
+This tool includes various resource files to optimize analysis effectiveness:
 
-### 停用詞和自定義詞典
+### Stopwords and Custom Dictionary
 
-- **停用詞表**：過濾常見但無意義的詞（代詞、助詞、連詞等）
-- **自定義詞典**：包含專業術語、實體名稱、常見複合詞等
+- **Stopwords List**: Filter common but meaningless words (pronouns, particles, conjunctions, etc.)
+- **Custom Dictionary**: Include specialized terms, entity names, common compound words, etc.
 
-### 情感詞典
+### Sentiment Dictionary
 
-- **正面情感詞典**：包含各類正面情感詞
-- **負面情感詞典**：包含各類負面情感詞
+- **Positive Sentiment Dictionary**: Contains various positive sentiment words
+- **Negative Sentiment Dictionary**: Contains various negative sentiment words
 
-### 標籤映射文件
+### Tag Mapping Files
 
-JSON格式的映射文件用於將技術代碼轉換為更易讀的中文標籤：
+JSON format mapping files are used to convert technical codes to more readable Chinese labels:
 
-- **詞性映射**：將簡短詞性代碼轉換為中文詞性名稱
-- **實體類型映射**：將英文實體類型轉換為中文標籤
-- **情感標籤映射**：將情感分析結果轉換為中文情感標籤
+- **Part-of-Speech Mapping**: Convert short POS codes to Chinese part-of-speech names
+- **Entity Type Mapping**: Convert English entity types to Chinese labels
+- **Sentiment Label Mapping**: Convert sentiment analysis results to Chinese sentiment labels
 
-## API 使用指南
+## API Usage Guide
 
-除了互動式菜單和命令行界面，您也可以在Python程式中直接使用本工具的API。以下是適合初學者的基礎指南：
+In addition to the interactive menu and command line interface, you can also directly use this tool's API in Python programs. The following is a basic guide suitable for beginners:
 
-### 入門指南（適合編程初學者）
+### Getting Started Guide (For Programming Beginners)
 
-如果您不熟悉編程，但希望嘗試使用本工具的API，請按照以下步驟操作：
+If you are not familiar with programming but want to try using this tool's API, please follow these steps:
 
-1. **建立一個新的Python文件**：
-   - 在文字編輯器中新建文件（例如 `my_analysis.py`）
-   - 確保文件與 Chinese Text Analyzer 工具在同一目錄下
+1. **Create a new Python file**:
+   - Create a new file in a text editor (e.g., `my_analysis.py`)
+   - Ensure the file is in the same directory as the Chinese Text Analyzer tool
 
-2. **複製基本範例**：將以下基本範例複製到您的文件中
+2. **Copy basic example**: Copy the following basic example to your file
 
 ```python
-# 導入必要的庫（這些是本工具的核心元件）
+# Import necessary libraries (these are the core components of this tool)
 from analyzer import ChineseTextAnalyzer
 from visualization import Visualizer
 
-# 初始化分析器（必須的第一步）
+# Initialize analyzer (required first step)
 analyzer = ChineseTextAnalyzer()
 
-# 您要分析的文本（替換為您自己的文本）
-text = "這是一段示例中文文本，用於展示分析功能。"
+# Text you want to analyze (replace with your own text)
+text = "This is a sample Chinese text to demonstrate analysis functionality."
 
-# 進行全面分析
+# Perform comprehensive analysis
 results = analyzer.analyze_text(text)
 
-# 顯示基本分析結果
-print("詞頻分析結果:")
+# Display basic analysis results
+print("Word frequency analysis results:")
 for word, freq in list(results['word_frequency'].items())[:5]:
-    print(f"  {word}: {freq} 次")
+    print(f"  {word}: {freq} times")
 
-print("\n詞性分析結果:")
+print("\nPart-of-speech analysis results:")
 for pos, count in list(results['pos_distribution'].items())[:3]:
-    print(f"  {pos}: {count} 個詞")
+    print(f"  {pos}: {count} words")
 
-# 生成詞雲圖（最直觀的視覺化效果）
+# Generate word cloud (most intuitive visualization effect)
 Visualizer.generate_wordcloud(
     results['word_frequency'], 
-    title='我的第一個詞雲',
+    title='My First Word Cloud',
     output_file='my_first_wordcloud.png'
 )
 
-print("\n分析完成！詞雲圖已保存為 'my_first_wordcloud.png'")
+print("\nAnalysis complete! Word cloud saved as 'my_first_wordcloud.png'")
 ```
 
-3. **運行您的程式**：
-   - 打開終端或命令提示符
-   - 進入到您的工作目錄
-   - 執行 `python my_analysis.py`
+3. **Run your program**:
+   - Open terminal or command prompt
+   - Navigate to your working directory
+   - Execute `python my_analysis.py`
 
-### 常見問題與解決方案
+### Common Issues and Solutions
 
-- **找不到模塊錯誤**：確保您在正確的目錄中執行程式
-- **中文顯示為亂碼**：尝试添加 `font_path='/System/Library/Fonts/PingFang.ttc'` 參數到 `generate_wordcloud` 函數中
-- **程序執行緩慢**：對於較長文本，降低 DPI 值可提高速度（例如：`dpi=150`）
+- **Module not found error**: Ensure you are executing the program in the correct directory
+- **Chinese characters display as garbled text**: Try adding `font_path='/System/Library/Fonts/PingFang.ttc'` parameter to the `generate_wordcloud` function
+- **Program runs slowly**: For longer texts, lowering DPI values can improve speed (e.g., `dpi=150`)
 
-### 進階API示例（適合有編程經驗的用戶）
+### Advanced API Examples (For Experienced Users)
 
-以下是更多進階API用法示例，供有一定編程經驗的用戶參考：
+The following are more advanced API usage examples for users with programming experience:
 
 ```python
 from analyzer import ChineseTextAnalyzer
 from visualization import Visualizer
 
-# 初始化分析器
+# Initialize analyzer
 analyzer = ChineseTextAnalyzer()
 
-# 分析文本
-text = "這是一段示例中文文本，用於展示分析功能。"
+# Analyze text
+text = "This is a sample Chinese text to demonstrate analysis functionality."
 results = analyzer.analyze_text(text)
 
-# 進行情感分析
+# Perform sentiment analysis
 sentiment = analyzer.analyze_sentiment(text)
-print(f"情感分析結果: {sentiment['sentiment_label']}")
+print(f"Sentiment analysis result: {sentiment['sentiment_label']}")
 
-# 提取關鍵詞
+# Extract keywords
 keywords = analyzer.keyword_extraction(text, top_k=5)
-print(f"前五個關鍵詞: {list(keywords.keys())}")
+print(f"Top five keywords: {list(keywords.keys())}")
 
-# 生成詞雲圖
+# Generate word cloud
 Visualizer.generate_wordcloud(
     results['word_frequency'], 
-    title='自定義詞雲標題',
+    title='Custom Word Cloud Title',
     figsize=(12, 10),
     background_color='black',
     max_words=100,
-    font_path='/System/Library/Fonts/PingFang.ttc'  # macOS中文字體路徑
+    font_path='/System/Library/Fonts/PingFang.ttc'  # macOS Chinese font path
 )
 
-# 生成完整視覺化報告
+# Generate complete visualization report
 viz_dir = Visualizer.create_visualization_report(
     results,
     output_dir='my_visualizations',
@@ -426,145 +426,146 @@ viz_dir = Visualizer.create_visualization_report(
     dpi=300
 )
 
-# 使用進階詞頻視覺化API
+# Use advanced word frequency visualization API
 Visualizer.plot_advanced_word_frequency(
     results['word_frequency'],
     top_n=15,
-    title='詞頻分布餅圖',
+    title='Word Frequency Distribution Pie Chart',
     save_path='my_visualizations/word_freq_pie.png',
     plot_type='pie',
     dpi=300
 )
 ```
 
-## 命令行參數參考
+## Command Line Parameter Reference
 
-以下是所有可用的命令行參數說明，包括基本用法範例：
+The following are descriptions of all available command line parameters, including basic usage examples:
 
-### 基礎參數（適合初學者）
+### Basic Parameters (For Beginners)
 
-| 參數 | 簡寫 | 描述 | 範例 |
+| Parameter | Short | Description | Example |
 | --- | --- | --- | --- |
-| `--input` | `-i` | 輸入文件或目錄路徑 | `--input sample.txt` |
-| `--output` | `-o` | 輸出目錄路徑（預設：results） | `--output my_results` |
-| `--no-viz` | | 不生成視覺化圖表 | `--no-viz` |
-| `--dpi` | | 視覺化分辨率（預設：300） | `--dpi 150` |
-| `--font` | | 中文字體路徑 | `--font /System/Library/Fonts/PingFang.ttc` |
+| `--input` | `-i` | Input file or directory path | `--input sample.txt` |
+| `--output` | `-o` | Output directory path (default: results) | `--output my_results` |
+| `--no-viz` | | Do not generate visualization charts | `--no-viz` |
+| `--dpi` | | Visualization resolution (default: 300) | `--dpi 150` |
+| `--font` | | Chinese font path | `--font /System/Library/Fonts/PingFang.ttc` |
 
-### 給初學者的命令行指南
+### Command Line Guide for Beginners
 
-如果您不熟悉命令行操作，以下是一個逐步指南：
+If you are not familiar with command line operations, here is a step-by-step guide:
 
-1. **開啟終端或命令提示符**：
-   - macOS：按下 `Command+空格` 鍵，輸入「Terminal」並按回車
-   - Windows：按下 `Win+R` 鍵，輸入「cmd」並按回車
+1. **Open terminal or command prompt**:
+   - macOS: Press `Command+Space`, type "Terminal" and press Enter
+   - Windows: Press `Win+R`, type "cmd" and press Enter
 
-2. **導航到程式目錄**：
+2. **Navigate to program directory**:
    ```
-   cd 程式所在的路徑
+   cd path_to_program
    ```
-   例如：`cd Downloads/chinese_text_analyzer`
+   For example: `cd Downloads/chinese_text_analyzer`
 
-3. **執行基本分析**：
+3. **Execute basic analysis**:
    ```
    python main.py --input input_texts/sample.txt
    ```
-   這會分析 `input_texts` 資料夾中的 `sample.txt` 文件
+   This will analyze the `sample.txt` file in the `input_texts` folder
 
-4. **範例：自定義輸出目錄**：
+4. **Example: Custom output directory**:
    ```
    python main.py --input input_texts/sample.txt --output my_results
    ```
-   這會將分析結果保存到 `my_results` 目錄
+   This will save analysis results to the `my_results` directory
 
-5. **範例：設置低分辨率以加快處理**：
+5. **Example: Set low resolution for faster processing**:
    ```
    python main.py --input input_texts/sample.txt --dpi 72
    ```
-   這會以低分辨率生成視覺化圖表，適合快速預覽
+   This will generate visualization charts at low resolution, suitable for quick preview
 
-### 命令行使用技巧
+### Command Line Usage Tips
 
-- **組合多個參數**：您可以同時使用多個參數
+- **Combine multiple parameters**: You can use multiple parameters simultaneously
   ```
   python main.py --input sample.txt --output custom_results --dpi 150 --font /System/Library/Fonts/PingFang.ttc
   ```
 
-- **使用簡寫形式**：大多數參數都有簡寫形式，可使命令更簡潔
+- **Use short forms**: Most parameters have short forms to make commands more concise
   ```
   python main.py -i sample.txt -o custom_results
   ```
 
-- **批量處理文件**：使用 `--batch` 參數處理整個目錄
+- **Batch process files**: Use `--batch` parameter to process entire directories
   ```
   python main.py --input input_folder --batch
   ```
 
-### 進階參數（適合熟悉命令行的用戶）
+### Advanced Parameters (For Command Line Experienced Users)
 
-| 參數 | 簡寫 | 描述 | 範例 |
+| Parameter | Short | Description | Example |
 | --- | --- | --- | --- |
-| `--dict` | `-d` | 自定義詞典路徑 | `--dict my_dict.txt` |
-| `--stopwords` | `-s` | 停用詞表路徑 | `--stopwords my_stopwords.txt` |
-| `--formats` | `-f` | 輸出格式，多種格式用逗號分隔 | `--formats json,csv,excel` |
-| `--batch` | `-b` | 批量處理模式（處理整個目錄） | `--batch` |
-| `--parallel` | `-p` | 使用並行處理（加速批量處理） | `--parallel` |
-| `--extensions` | `-e` | 要處理的文件擴展名（批量模式） | `--extensions .txt,.md` |
-| `--debug` | | 啟用調試模式（顯示更多技術訊息） | `--debug` |
-| `--advanced-viz` | `-av` | 進階詞頻視覺化選項 | `--advanced-viz pie,vertical,length` |
-| `--viz` | `-v` | 指定要生成的視覺化圖表類型 | `--viz wordcloud,word_frequency` |
+| `--dict` | `-d` | Custom dictionary path | `--dict my_dict.txt` |
+| `--stopwords` | `-s` | Stopwords list path | `--stopwords my_stopwords.txt` |
+| `--formats` | `-f` | Output formats, multiple formats separated by commas | `--formats json,csv,excel` |
+| `--batch` | `-b` | Batch processing mode (process entire directory) | `--batch` |
+| `--parallel` | `-p` | Use parallel processing (accelerate batch processing) | `--parallel` |
+| `--extensions` | `-e` | File extensions to process (batch mode) | `--extensions .txt,.md` |
+| `--debug` | | Enable debug mode (show more technical information) | `--debug` |
+| `--advanced-viz` | `-av` | Advanced word frequency visualization options | `--advanced-viz pie,vertical,length` |
+| `--viz` | `-v` | Specify types of visualization charts to generate | `--viz wordcloud,word_frequency` |
 
-### 常見命令行組合範例
+### Common Command Line Combination Examples
 
 ```bash
-# 基本分析
+# Basic analysis
 python main.py --input sample.txt
 
-# 使用自定義字體和輸出目錄
+# Use custom font and output directory
 python main.py --input sample.txt --output my_results --font /System/Library/Fonts/PingFang.ttc
 
-# 批量處理目錄中所有.txt文件，使用並行加速
+# Batch process all .txt files in directory with parallel acceleration
 python main.py --input input_folder --batch --extensions .txt --parallel
 
-# 生成所有格式的數據，但不生成視覺化圖表（快速處理）
+# Generate all data formats but no visualization charts (fast processing)
 python main.py --input sample.txt --formats json,csv,excel --no-viz
 
-# 只生成詞雲和詞頻圖，使用低分辨率
+# Only generate word cloud and word frequency charts with low resolution
 python main.py --input sample.txt --viz wordcloud,word_frequency --dpi 72
 
-# 使用進階視覺化選項
+# Use advanced visualization options
 python main.py --input sample.txt --advanced-viz pie,vertical,length
 ```
 
-## 未來擴展建議
+## Future Enhancement Suggestions
 
-如想進一步發展，我建議未來版本可考慮添加以下功能和改進：
+For further development, I suggest future versions could consider adding the following features and improvements:
 
-### 內容分析擴展
+### Content Analysis Extensions
 
-- **主題建模**：整合 LDA（Latent Dirichlet Allocation）主題建模，自動發現文本中的主題結構
-- **文本相似度比較**：添加多文本相似度分析，比較不同文本之間的關聯性
-- **時間序列分析**：針對具有時間戳記的文本集合，提供語言使用隨時間變化的趨勢分析
-- **關聯詞分析**：探索詞語之間的關聯及共現關係，提供更深入的語義理解
+- **Topic Modeling**: Integrate LDA (Latent Dirichlet Allocation) topic modeling to automatically discover topic structures in text
+- **Text Similarity Comparison**: Add multi-text similarity analysis to compare relationships between different texts
+- **Time Series Analysis**: For text collections with timestamps, provide trend analysis of language usage changes over time
+- **Associated Word Analysis**: Explore associations and co-occurrence relationships between words for deeper semantic understanding
 
-### 用戶界面優化
+### User Interface Optimization
 
-- **網頁界面**：開發基於瀏覽器的網頁界面，無需命令行或本地安裝
-- **更多視覺化選項**：提供更豐富的交互式視覺化選項（如熱力圖、網絡圖等）
-- **批量任務隊列**：實現任務隊列系統，更好地管理大批量處理任務
-- **實時分析儀表板**：提供實時文本分析儀表板，動態展示分析結果
+- **Web Interface**: Develop browser-based web interface without requiring command line or local installation
+- **More Visualization Options**: Provide richer interactive visualization options (such as heatmaps, network diagrams, etc.)
+- **Batch Task Queue**: Implement task queue system for better management of large batch processing tasks
+- **Real-time Analysis Dashboard**: Provide real-time text analysis dashboard dynamically displaying analysis results
 
-### 技術改進
+### Technical Improvements
 
-- **GPU 加速支持**：對於大型文本處理提供 GPU 加速選項
-- **更多文本格式支持**：擴展 PDF、Word、網頁等格式的直接解析能力
-- **機器學習增強**：整合更先進的機器學習模型提升情感分析和關鍵詞提取的準確性
+- **GPU Acceleration Support**: Provide GPU acceleration options for large text processing
+- **More Text Format Support**: Extend direct parsing capabilities for PDF, Word, web page and other formats
+- **Machine Learning Enhancement**: Integrate more advanced machine learning models to improve accuracy of sentiment analysis and keyword extraction
 
-### 集成與擴展性
+### Integration and Extensibility
 
-- **API擴展**：提供完整的 RESTful API，便於與其他系統集成
-- **插件系統**：開發插件架構，允許社區成員貢獻新功能和擴展
-- **數據庫集成**：添加與常見數據庫系統的連接器，便於大規模文本處理
+- **API Expansion**: Provide complete RESTful API for easy integration with other systems
+- **Plugin System**: Develop plugin architecture allowing community members to contribute new features and extensions
+- **Database Integration**: Add connectors to common database systems for large-scale text processing
 
-## 鳴謝
-此程式由Claude 3.7 Sonnet及Deepseek協助完成。
+## Acknowledgments
+
+This program was completed with assistance from Claude 3.7 Sonnet and Deepseek. 
